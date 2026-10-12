@@ -1,0 +1,78 @@
+name: Build Rumk APK Automatically
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build Rumk Android App
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download repository files
+        uses: actions/checkout@v4
+
+      - name: Extract Rumk ZIP
+        shell: bash
+        run: |
+          ZIP_FILE="Rumk_Mobile_MK442_GitHub_Project.zip"
+
+          if [ ! -f "$ZIP_FILE" ]; then
+            ZIP_FILE="$(find . -maxdepth 1 -type f -iname '*.zip' -print -quit)"
+          fi
+
+          if [ -z "$ZIP_FILE" ] || [ ! -f "$ZIP_FILE" ]; then
+            echo "::error::No project ZIP found in the repository root."
+            exit 1
+          fi
+
+          echo "Extracting: $ZIP_FILE"
+
+          rm -rf build-src
+          mkdir -p build-src
+
+          unzip -q "$ZIP_FILE" -d build-src
+
+          if [ ! -f "build-src/Rumk_Mobile_MK442/android/build.gradle" ]; then
+            echo "::error::The expected Android project was not found inside the ZIP."
+            find build-src -maxdepth 4 -type f | head -80
+            exit 1
+          fi
+
+          echo "ZIP extracted successfully."
+
+      - name: Install Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Prepare Rumk files
+        run: |
+          python3 build-src/Rumk_Mobile_MK442/sync_web_assets.py
+
+      - name: Build Android APK
+        run: |
+          gradle --no-daemon \
+            -p "$GITHUB_WORKSPACE/build-src/Rumk_Mobile_MK442/android" \
+            assembleDebug
+
+      - name: Upload finished APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Rumk-MK442-Android-APK
+          path: build-src/Rumk_Mobile_MK442/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 14
