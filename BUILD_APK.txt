@@ -1,6 +1,0 @@
-Fast APK build:
-1) Push all project files to a GitHub repository.
-2) Open Actions > Build Rumk Android APK.
-3) Download the Rumk-MK442-Android-APK artifact from a successful run.
-4) Extract app-debug.apk and install it on Android.
-See README_AR.md for full instructions and provider limitations.
