@@ -1,7 +1,0 @@
-Rumk Mobile — MK442
-
-Copyright (c) 2026 Majd Al-Khamis (MK442).
-
-All rights reserved for the Rumk name as used in this project, original app UI, visual design, and project source authored for this package. No permission is granted to remove the designer credit or to redistribute a modified branded build as an official MK442 release without permission.
-
-Third-party platforms, player SDKs, videos, thumbnails, names, marks and other content remain the property of their respective owners and are subject to their separate terms. This notice does not grant rights to third-party content.
